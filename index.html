@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkillSuggest — Adaptive Career Pathfinder</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg1:#6a11cb; --bg2:#2575fc; --card-bg: rgba(255,255,255,0.10);
+      --accent:#22c55e; --muted: rgba(255,255,255,0.85);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Inter,system-ui,Roboto, Arial;
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(135deg,var(--bg1),var(--bg2)); color:#fff; padding:20px;
+    }
+    .app{ width:100%; max-width:920px; border-radius:14px; overflow:hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    }
+    header{ display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.04) }
+    header h1{ margin:0; font-size:18px }
+    header p{ margin:0; color:var(--muted); font-size:13px }
+    main.content{ padding:22px; }
+
+    .page{ display:none; }
+    .page.active{ display:block; }
+
+    .center{ text-align:center }
+    .lead{ color:var(--muted); margin-top:8px; }
+
+    .btn { background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; margin:6px; }
+    .btn.secondary{ background:transparent; border:1px solid rgba(255,255,255,0.12) }
+    .small{ font-size:13px; color:var(--muted) }
+
+    /* user selection */
+    .grid-3{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:18px }
+    .card { background: var(--card-bg); padding:18px; border-radius:12px; min-width:180px; text-align:center; cursor:pointer; border:1px solid rgba(255,255,255,0.03) }
+    .card:hover{ transform:translateY(-6px); transition:all 180ms ease }
+
+    /* quiz */
+    .progress { width:100%; background: rgba(255,255,255,0.07); height:12px; border-radius:10px; overflow:hidden; margin-bottom:14px }
+    .progress .bar{ height:100%; width:0%; background:linear-gradient(90deg,#a78bfa,#60a5fa); transition:width 220ms ease }
+
+    .question-card{ background:var(--card-bg); padding:18px; border-radius:12px }
+    .options{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px }
+    .option-btn{ flex:1; min-width:120px; padding:10px; border-radius:10px; background:transparent; border:1px solid rgba(255,255,255,0.06); color:#fff; cursor:pointer; font-weight:700 }
+
+    /* report */
+    .report-grid{ display:grid; grid-template-columns:1fr 360px; gap:18px }
+    .panel{ background:var(--card-bg); padding:16px; border-radius:10px }
+    .resource-link{ display:inline-block; padding:8px 10px; margin:6px 0; background:rgba(255,255,255,0.03); color:#e6f1ff; text-decoration:none; border-radius:8px }
+
+    @media (max-width:900px){
+      .report-grid{ grid-template-columns:1fr }
+      .grid-3{ gap:10px }
+    }
+  #scoreChart {
+  height: 260px !important;
+  max-height: 260px !important;
+}
+                                          
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="SkillSuggest">
+    <header>
+      <div>
+        <h1>🎯 SkillSuggest</h1>
+        <p class="small">Adaptive quiz → tailored skills, professions & free resources</p>
+      </div>
+      <div>
+        <button class="btn secondary" id="restartTop" title="Restart">Restart</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Page: Intro -->
+      <section id="page-intro" class="page active">
+        <div class="center">
+          <h2>Discover your strengths. Build your future.</h2>
+          <p class="lead">Answer a short adaptive quiz so we can recommend skills, careers and free resources for your age & stream.</p>
+          <div style="margin-top:18px">
+            <button class="btn" id="toUserInfo">Start Quiz</button>
+            <button class="btn secondary" id="howBtnHeader">How it works</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page: User Info (select class/age group) -->
+      <section id="page-userinfo" class="page">
+        <div class="center">
+          <h2>Select your class / age group</h2>
+          <p class="lead">Choose your current school class range so questions are relevant.</p>
+          <div class="grid-3" style="margin-top:18px;">
+            <div class="card" data-group="6-8">Class 6 - 8</div>
+            <div class="card" data-group="9-10">Class 9 - 10</div>
+            <div class="card" data-group="11-12">Class 11 - 12</div>
+          </div>
+          <div style="margin-top:18px;">
+            <button class="btn secondary" id="backToIntro">Back</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page: Stream selection for 11-12 -->
+      <section id="page-stream" class="page">
+        <div class="center">
+          <h2>Select your stream</h2>
+          <p class="lead">Choose the stream you're in (Class 11-12).</p>
+          <div class="grid-3" style="margin-top:18px;">
+            <div class="card" data-stream="arts">Arts</div>
+            <div class="card" data-stream="commerce">Commerce</div>
+            <div class="card" data-stream="science">Science</div>
+          </div>
+          <div style="margin-top:18px;">
+            <button class="btn secondary" id="backToUserInfo">Back</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page: Quiz -->
+      <section id="page-quiz" class="page">
+        <div>
+          <div class="progress"><div class="bar" id="progressBar"></div></div>
+          <div class="question-card">
+            <h3 id="qTitle">Question</h3>
+            <p id="qText" class="small" style="margin-top:6px; color:rgba(255,255,255,0.9)"></p>
+            <div class="options" id="qOptions"></div>
+          </div>
+          <div style="text-align:center; margin-top:12px;">
+            <button class="btn secondary" id="quitToIntro">Quit</button>
+            <button class="btn" id="nextAuto" style="display:none">Next</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page: Continue (end-of-quiz) -->
+      <section id="page-continue" class="page">
+        <div class="center">
+          <h2>All done 🎉</h2>
+          <p class="lead">You answered all questions. Continue to view your personalized report.</p>
+          <div style="margin-top:16px;">
+            <button class="btn" id="toReportBtn">Continue to Report</button>
+            <button class="btn secondary" id="retakeBtn">Retake Quiz</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page: Report -->
+      <section id="page-report" class="page">
+        <div class="report-grid">
+          <div class="panel">
+            <h3>Skill profile</h3>
+            <p class="small">Visual breakdown of your scores</p>
+            <canvas id="scoreChart" style="margin-top:12px; width:100%; height:260px;"></canvas>
+
+            <div style="margin-top:14px;">
+              <h4>Top suggestions</h4>
+              <div id="topSkills"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h4>Recommended Professions</h4>
+            <div id="professionsList" style="margin-top:10px"></div>
+
+            <h4 style="margin-top:14px;">Suggested Resources</h4>
+            <div id="resourceList" style="margin-top:10px"></div>
+
+            <div style="margin-top:16px;">
+              <button class="btn" id="restartBtn">Restart (Home)</button>
+              <button class="btn secondary" id="shareBtn">Share Report</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer style="padding:12px 22px; border-top:1px solid rgba(255,255,255,0.03); display:flex; justify-content:space-between;">
+      <div class="small">Made for Makers Fest — SkillSuggest</div>
+      <div class="small">Offline • Free resources</div>
+    </footer>
+  </div>
+
+  <script>
+  /************************
+   * Adaptive Quiz - JS
+   ************************/
+  // questions per group (short sets; you can expand)
+  const questionSets = {
+    "6-8": [
+      { text:"Do you like exploring new ideas and projects?", skill:"Creativity" },
+      { text:"Do you enjoy simple science experiments or kits?", skill:"Technical" },
+      { text:"Do you like reading stories and discussing characters?", skill:"Communication" },
+      { text:"Do you enjoy puzzles and logical games?", skill:"Logical Thinking" },
+      { text:"Do you like helping friends solve their problems?", skill:"Empathy" }
+    ],
+    "9-10": [
+      { text:"Do you enjoy solving math problems or puzzles?", skill:"Logical Thinking" },
+      { text:"Do you build small projects or learn software basics?", skill:"Technical" },
+      { text:"Do you like writing or telling stories to others?", skill:"Communication" },
+      { text:"Do you enjoy making creative art or designs?", skill:"Creativity" },
+      { text:"Do you volunteer or help classmates often?", skill:"Empathy" },
+      // extra questions to make longer
+      { text:"Do you plan study schedules for exams?", skill:"Logical Thinking" },
+      { text:"Do you try to learn coding or app use by yourself?", skill:"Technical" },
+      { text:"Do you participate in debates or presentations?", skill:"Communication" }
+    ],
+    "11-12-arts": [
+      { text:"Do you enjoy literature, history or languages?", skill:"Communication" },
+      { text:"Do you like designing posters, graphics, or art?", skill:"Creativity" },
+      { text:"Do you enjoy thinking about society and people?", skill:"Empathy" },
+      { text:"Do you participate in theater, writing or debating?", skill:"Communication" },
+      { text:"Do you explore creative career ideas often?", skill:"Creativity" },
+      { text:"Do you help peers understand social topics?", skill:"Empathy" }
+    ],
+    "11-12-commerce": [
+      { text:"Do you enjoy working with numbers and budgets?", skill:"Logical Thinking" },
+      { text:"Are you interested in starting a small business or selling things?", skill:"Technical" },
+      { text:"Do you enjoy presenting ideas or pitching plans?", skill:"Communication" },
+      { text:"Do you like analyzing market trends or case studies?", skill:"Logical Thinking" },
+      { text:"Do you enjoy organizing events or teams?", skill:"Communication" }
+    ],
+    "11-12-science": [
+      { text:"Do you enjoy experiments and lab work?", skill:"Technical" },
+      { text:"Do you like solving physics/chemistry/math problems?", skill:"Logical Thinking" },
+      { text:"Do you plan and test solutions carefully?", skill:"Logical Thinking" },
+      { text:"Do you read scientific articles or watch science videos?", skill:"Technical" },
+      { text:"Do you think about engineering or research careers?", skill:"Technical" }
+    ]
+  };
+
+  // professions mapping
+  const professions = {
+    "Logical Thinking": ["Data Analyst", "Engineer", "Economist", "Researcher"],
+    "Creativity": ["UI/UX Designer", "Animator", "Writer", "Art Director"],
+    "Communication": ["Teacher", "Journalist", "PR Manager", "Content Strategist"],
+    "Technical": ["Software Developer", "Lab Technician", "IT Support", "Mechanical Technician"],
+    "Empathy": ["Counselor", "Social Worker", "Nurse", "HR Specialist"]
+  };
+
+  // resources (example)
+  const resources = {
+    "Logical Thinking":[{title:"Khan Academy",url:"https://www.khanacademy.org/"},{title:"Coursera - Critical Thinking",url:"https://www.coursera.org/courses?query=critical%20thinking"}],
+    "Creativity":[{title:"Coursera - Creative Thinking",url:"https://www.coursera.org/courses?query=creative%20thinking"},{title:"YouTube - The Futur",url:"https://www.youtube.com/@thefutur"}],
+    "Communication":[{title:"Coursera - Effective Communication",url:"https://www.coursera.org/courses?query=communication"},{title:"YouTube - TEDx",url:"https://www.youtube.com/@TEDxTalks"}],
+    "Technical":[{title:"freeCodeCamp",url:"https://www.freecodecamp.org/"},{title:"Traversy Media (YouTube)",url:"https://www.youtube.com/@TraversyMedia"}],
+    "Empathy":[{title:"Coursera - Social Work",url:"https://www.coursera.org/courses?query=social%20work"},{title:"VolunteerMatch",url:"https://www.volunteermatch.org/"}]
+  };
+
+  // app state
+  let selectedGroup = null;     // e.g. "6-8" or "11-12"
+  let selectedStream = null;    // for 11-12 -> "arts"/"commerce"/"science"
+  let currentQuestions = [];    // array used for quiz
+  let qIndex = 0;
+  const scores = { "Logical Thinking":0, "Creativity":0, "Communication":0, "Technical":0, "Empathy":0 };
+
+  // page elements
+  const pages = {
+    intro: document.getElementById('page-intro'),
+    userinfo: document.getElementById('page-userinfo'),
+    stream: document.getElementById('page-stream'),
+    quiz: document.getElementById('page-quiz'),
+    cont: document.getElementById('page-continue'),
+    report: document.getElementById('page-report')
+  };
+
+  // header / top buttons
+  document.getElementById('restartTop').addEventListener('click', resetAll);
+  document.getElementById('toUserInfo').addEventListener('click', ()=> showPage('userinfo'));
+  document.getElementById('howBtnHeader').addEventListener('click', ()=> alert("Answer a few questions adapted to your class/stream. We'll suggest skills, careers and free resources."));
+
+  // userinfo cards click
+  document.querySelectorAll('#page-userinfo .card').forEach(card=>{
+    card.addEventListener('click', ()=> {
+      const g = card.getAttribute('data-group');
+      selectGroup(g);
+    });
+  });
+  document.getElementById('backToIntro').addEventListener('click', ()=> showPage('intro'));
+
+  // stream selection cards
+  document.querySelectorAll('#page-stream .card').forEach(card=>{
+    card.addEventListener('click', ()=> {
+      const s = card.getAttribute('data-stream');
+      selectStream(s);
+    });
+  });
+  document.getElementById('backToUserInfo').addEventListener('click', ()=> showPage('userinfo'));
+
+  // quiz buttons
+  document.getElementById('quitToIntro').addEventListener('click', ()=> showPage('intro'));
+  document.getElementById('toReportBtn').addEventListener('click', showReport);
+  document.getElementById('retakeBtn').addEventListener('click', ()=> startQuiz()); // retake starts quiz again
+
+  // report actions
+  document.getElementById('restartBtn').addEventListener('click', resetAll);
+  document.getElementById('shareBtn').addEventListener('click', shareResult);
+
+  // helper to show page
+  function showPage(name){
+    for(const k in pages) pages[k].classList.remove('active');
+    pages[name].classList.add('active');
+    // reset some UI
+    if(name === 'quiz') renderQuestion();
+  }
+
+  // selecting group
+  function selectGroup(g){
+    selectedGroup = g;
+    if(g === '11-12'){
+      // need stream selection
+      showPage('stream');
+    } else {
+      prepareQuestionsForGroup(g);
+      startQuiz();
+    }
+  }
+
+  function selectStream(s){
+    selectedStream = s;
+    const groupKey = `11-12-${s}`;
+    prepareQuestionsForGroup(groupKey);
+    startQuiz();
+  }
+
+  function prepareQuestionsForGroup(key){
+    currentQuestions = questionSets[key] ? questionSets[key].slice() : questionSets['9-10'].slice();
+    // ensure variety: if set too short, duplicate to reach ~10
+    while(currentQuestions.length < 8){
+      currentQuestions = currentQuestions.concat(currentQuestions.slice(0,3));
+    }
+    qIndex = 0;
+    // reset scores
+    for(let k in scores) scores[k] = 0;
+  }
+
+  function startQuiz(){
+    showPage('quiz');
+    // small delay to ensure page visible then render
+    setTimeout(()=> renderQuestion(), 80);
+  }
+
+  // render question UI
+  function renderQuestion(){
+    const qTitle = document.getElementById('qTitle');
+    const qText = document.getElementById('qText');
+    const qOptions = document.getElementById('qOptions');
+    const progressBar = document.getElementById('progressBar');
+
+    if(qIndex >= currentQuestions.length){
+      // finished
+      showPage('cont');
+      progressBar.style.width = '100%';
+      return;
+    }
+
+    const current = currentQuestions[qIndex];
+    qTitle.textContent = `Question ${qIndex+1} of ${currentQuestions.length}`;
+    qText.textContent = current.text;
+    progressBar.style.width = `${Math.round((qIndex/currentQuestions.length)*100)}%`;
+
+    qOptions.innerHTML = '';
+    const yes = document.createElement('button');
+    yes.className = 'option-btn';
+    yes.textContent = 'Yes';
+    yes.onclick = ()=> { recordAnswer(true); };
+
+    const no = document.createElement('button');
+    no.className = 'option-btn';
+    no.textContent = 'No';
+    no.onclick = ()=> { recordAnswer(false); };
+
+    qOptions.appendChild(yes);
+    qOptions.appendChild(no);
+  }
+
+  function recordAnswer(isYes){
+    const q = currentQuestions[qIndex];
+    if(isYes) scores[q.skill] = (scores[q.skill] || 0) + 1;
+    qIndex++;
+    renderQuestion();
+  }
+
+  // produce report
+  let chartInstance = null;
+  function showReport(){
+    showPage('report');
+    // prepare chart data
+    const labels = Object.keys(scores);
+    const values = labels.map(l => scores[l]);
+    // top skills
+    const sorted = labels.map(l=>({k:l,v:scores[l]})).sort((a,b)=>b.v - a.v);
+    const top3 = sorted.slice(0,3);
+    // personality quick label
+    let persona = "Balanced Explorer";
+    if(sorted[0] && sorted[0].k === "Creativity") persona = "Creative Innovator";
+    else if(sorted[0] && sorted[0].k === "Logical Thinking") persona = "Analytical Thinker";
+    else if(sorted[0] && sorted[0].k === "Communication") persona = "Expressive Leader";
+    else if(sorted[0] && sorted[0].k === "Technical") persona = "Tech Builder";
+    else if(sorted[0] && sorted[0].k === "Empathy") persona = "Kind Mentor";
+
+    // show top skills
+    const topSkillsEl = document.getElementById('topSkills');
+    topSkillsEl.innerHTML = `<p class="small">Personality: <strong>${persona}</strong></p>
+      <ul style="list-style:none;padding:0;margin-top:8px;">
+        ${top3.map(s=>`<li style="margin:8px 0;padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;"><strong>${s.k}</strong> — ${s.v} pts</li>`).join('')}
+      </ul>`;
+
+    // professions: based on top 2 skills
+    const profEl = document.getElementById('professionsList');
+    profEl.innerHTML = '';
+    const professionsSet = new Set();
+    top3.slice(0,2).forEach(s=>{
+      (professions[s.k] || []).forEach(p=> professionsSet.add(p));
+    });
+    if(professionsSet.size === 0) profEl.textContent = "No suggestions available.";
+    else {
+      profEl.innerHTML = `<ul style="padding:0; list-style:none; margin:0;">${[...professionsSet].slice(0,6).map(p=>`<li style="margin:8px 0;">• ${p}</li>`).join('')}</ul>`;
+    }
+
+    // resources: merge for top3
+    const resEl = document.getElementById('resourceList');
+    resEl.innerHTML = '';
+    const resSeen = new Set();
+    top3.forEach(s=>{
+      (resources[s.k]||[]).forEach(r=>{
+        if(!resSeen.has(r.url)){
+          resSeen.add(r.url);
+          const a = document.createElement('a');
+          a.className = 'resource-link';
+          a.href = r.url;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = r.title;
+          resEl.appendChild(a);
+        }
+      });
+    });
+
+    // draw chart
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+    if(chartInstance) chartInstance.destroy();
+   chartInstance = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [{
+      data: values,
+      backgroundColor: ['#a78bfa','#f472b6','#60a5fa','#34d399','#f59e0b'],
+      borderRadius: 6
+    }]
+  },
+  options: {
+    animation: false,
+    responsive: true,
+    maintainAspectRatio: false,
+    resizeDelay: 300,    // ✅ FIXES continuous stretching
+
+    scales: {
+      y: { beginAtZero: true, ticks: { stepSize: 1 } }
+    },
+    plugins: {
+      legend: { display: false }
+    }
+  }
+});
+   }
+  function shareResult(){
+    const sorted = Object.keys(scores).map(k=>({k,v:scores[k]})).sort((a,b)=>b.v-a.v);
+    const top = sorted[0]?sorted[0].k:'my top skill';
+    const text = `SkillSuggest: my top skill is ${top}. Try SkillSuggest for guided skills & careers!`;
+    if(navigator.clipboard) navigator.clipboard.writeText(text).then(()=> alert('Copied to clipboard!'));
+    else prompt('Copy this:', text);
+  }
+
+  function resetAll(){
+    // reset state and show intro
+    selectedGroup = null; selectedStream = null; currentQuestions = []; qIndex = 0;
+    for(let k in scores) scores[k]=0;
+    if(chartInstance){ chartInstance.destroy(); chartInstance = null; }
+    showPage('intro');
+  }
+
+  // Wire top-level UI for debugging / accessibility: allow pressing Enter to pick default
+  document.addEventListener('keydown', (e)=> {
+    if(e.key === 'Escape') resetAll();
+  });
+
+  // optional: initial test hook
+  // showPage('intro'); // already active
+  </script>
+</body>
+</html>
