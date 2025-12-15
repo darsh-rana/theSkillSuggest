@@ -66,21 +66,33 @@
     .logo {
       height: 50px;
       width: auto;
+      cursor: pointer;
       display: inline-block;
     } 
                                           
   </style>
 </head>
 <body>
+  <header>
+  <a href="/">
+    <img src="skill-suggest-logo.png"
+         alt="Skill Suggest Logo"
+         class="logo">
+  </a>
+
+  <div>
+    <h1>Skill Suggest</h1>
+    <p>Adaptive Career Guidance</p>
+  </div>
+</header>
+
   <div class="app" role="application" aria-label="SkillSuggest">
     <header>
       <div>
         <h1>🎯 SkillSuggest</h1>
         <p class="small">Adaptive quiz → tailored skills, professions & free resources</p>
       </div>
-     header<img src="skill-suggest-logo.png"
-     alt="Skill Suggest Logo"
-     class="logo">
+     
       <div>
         <button class="btn secondary" id="restartTop" title="Restart">Restart</button>
       </div>
@@ -505,6 +517,7 @@
   </script>
 </body>
 </html>
+
 
 
 
