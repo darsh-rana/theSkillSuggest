@@ -22,11 +22,6 @@
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       box-shadow: 0 12px 30px rgba(0,0,0,0.35);
     }
-    header <a href="/">
-             <img src="images/skill-suggest-logo.png"
-                  alt="Skill Suggest Logo"
-                  class="logo">
-           </a>
     header{ display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.04) }
     header h1{ margin:0; font-size:18px }
     header p{ margin:0; color:var(--muted); font-size:13px }
@@ -71,7 +66,7 @@
     .logo {
       height: 50px;
       width: auto;
-      cursor: pointer;
+      display: inline-block;
     } 
                                           
   </style>
@@ -83,6 +78,9 @@
         <h1>🎯 SkillSuggest</h1>
         <p class="small">Adaptive quiz → tailored skills, professions & free resources</p>
       </div>
+     header<img src="skill-suggest-logo.png"
+     alt="Skill Suggest Logo"
+     class="logo">
       <div>
         <button class="btn secondary" id="restartTop" title="Restart">Restart</button>
       </div>
@@ -507,6 +505,7 @@
   </script>
 </body>
 </html>
+
 
 
 
