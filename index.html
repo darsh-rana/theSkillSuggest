@@ -21,6 +21,8 @@
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       box-shadow: 0 12px 30px rgba(0,0,0,0.35);
       animation: slideIn 0.4s ease;
+      max-height: 85vh;
+      overflow-y: auto;
     }
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -29,7 +31,7 @@
     header{ display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.04); flex-wrap:wrap; gap:10px; }
     header h1{ margin:0; font-size:18px; flex:1; min-width:180px; }
     header p{ margin:0; color:var(--muted); font-size:13px; flex:1; min-width:200px; }
-    main.content{ padding:22px; min-height:400px; }
+    main.content{ padding:22px; }
 
     .page{ display:none; opacity:0; transition:opacity 0.3s ease; }
     .page.active{ display:block; opacity:1; }
@@ -65,6 +67,7 @@
     /* report */
     .report-grid{ display:grid; grid-template-columns:1fr 360px; gap:18px }
     .panel{ background:var(--card-bg); padding:16px; border-radius:10px; animation: fadeIn 0.4s ease; }
+    #scoreChart { width: 100% !important; height: 260px !important; }
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -771,7 +774,13 @@
     chartInstance = new Chart(ctx, {
       type:'bar',
       data:{ labels, datasets:[{ data:values, backgroundColor:['#a78bfa','#f472b6','#60a5fa','#34d399','#f59e0b'], borderRadius:6 }] },
-      options:{ scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1 } } }, plugins:{ legend:{ display:false } }, responsive:true, maintainAspectRatio:false, animation: false }
+      options:{ 
+        scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1 } } }, 
+        plugins:{ legend:{ display:false } }, 
+        responsive: false,
+        maintainAspectRatio: false,
+        animation: { duration: 0 }
+      }
     });
   }
 
