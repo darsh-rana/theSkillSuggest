@@ -15,47 +15,102 @@
       margin:0; font-family:Inter,system-ui,Roboto, Arial;
       min-height:100vh; display:flex; align-items:center; justify-content:center;
       background: linear-gradient(135deg,var(--bg1),var(--bg2)); color:#fff; padding:20px;
+      transition: background 0.3s ease;
     }
     .app{ width:100%; max-width:920px; border-radius:14px; overflow:hidden;
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+      animation: slideIn 0.4s ease;
     }
-    header{ display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.04) }
-    header h1{ margin:0; font-size:18px }
-    header p{ margin:0; color:var(--muted); font-size:13px }
-    main.content{ padding:22px; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    header{ display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.04); flex-wrap:wrap; gap:10px; }
+    header h1{ margin:0; font-size:18px; flex:1; min-width:180px; }
+    header p{ margin:0; color:var(--muted); font-size:13px; flex:1; min-width:200px; }
+    main.content{ padding:22px; min-height:400px; }
 
-    .page{ display:none; }
-    .page.active{ display:block; }
+    .page{ display:none; opacity:0; transition:opacity 0.3s ease; }
+    .page.active{ display:block; opacity:1; }
 
     .center{ text-align:center }
     .lead{ color:var(--muted); margin-top:8px; }
 
-    .btn { background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; margin:6px; }
+    .btn { background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; margin:6px; transition:all 0.2s ease; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
+    .btn:active { transform: translateY(0); }
     .btn.secondary{ background:transparent; border:1px solid rgba(255,255,255,0.12) }
+    .btn.secondary:hover { background:rgba(255,255,255,0.05); }
     .small{ font-size:13px; color:var(--muted) }
 
     /* user selection */
     .grid-3{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:18px }
-    .card { background: var(--card-bg); padding:18px; border-radius:12px; min-width:180px; text-align:center; cursor:pointer; border:1px solid rgba(255,255,255,0.03) }
-    .card:hover{ transform:translateY(-6px); transition:all 180ms ease }
+    .card { background: var(--card-bg); padding:18px; border-radius:12px; min-width:180px; text-align:center; cursor:pointer; border:1px solid rgba(255,255,255,0.03); transition:all 0.3s ease; }
+    .card:hover{ transform:translateY(-6px); box-shadow: 0 8px 20px rgba(34, 197, 94, 0.2); }
 
     /* quiz */
     .progress { width:100%; background: rgba(255,255,255,0.07); height:12px; border-radius:10px; overflow:hidden; margin-bottom:14px }
     .progress .bar{ height:100%; width:0%; background:linear-gradient(90deg,#a78bfa,#60a5fa); transition:width 220ms ease }
 
-    .question-card{ background:var(--card-bg); padding:18px; border-radius:12px }
+    .question-card{ background:var(--card-bg); padding:18px; border-radius:12px; animation: fadeInDown 0.3s ease; }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     .options{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px }
-    .option-btn{ flex:1; min-width:120px; padding:10px; border-radius:10px; background:transparent; border:1px solid rgba(255,255,255,0.06); color:#fff; cursor:pointer; font-weight:700 }
+    .option-btn{ flex:1; min-width:120px; padding:10px; border-radius:10px; background:transparent; border:1px solid rgba(255,255,255,0.06); color:#fff; cursor:pointer; font-weight:700; transition:all 0.2s ease; }
+    .option-btn:hover { background:rgba(255,255,255,0.08); transform: scale(1.02); }
 
     /* report */
     .report-grid{ display:grid; grid-template-columns:1fr 360px; gap:18px }
-    .panel{ background:var(--card-bg); padding:16px; border-radius:10px }
-    .resource-link{ display:inline-block; padding:8px 10px; margin:6px 0; background:rgba(255,255,255,0.03); color:#e6f1ff; text-decoration:none; border-radius:8px }
+    .panel{ background:var(--card-bg); padding:16px; border-radius:10px; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .resource-link{ display:inline-block; padding:8px 10px; margin:6px 0; background:rgba(255,255,255,0.03); color:#e6f1ff; text-decoration:none; border-radius:8px; transition:all 0.2s ease; }
+    .resource-link:hover { background:rgba(255,255,255,0.08); }
+
+    /* profile */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .stat-card { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; text-align: center; }
+    .stat-value { font-size: 20px; font-weight: bold; color: var(--accent); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* theme toggle */
+    .theme-toggle { display: flex; align-items: center; gap: 8px; }
+    .toggle-switch { width: 40px; height: 22px; background: rgba(255,255,255,0.2); border-radius: 11px; cursor: pointer; position: relative; transition: background 0.3s; }
+    .toggle-switch.active { background: var(--accent); }
+    .toggle-switch::after { content: ''; position: absolute; width: 18px; height: 18px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: left 0.3s; }
+    .toggle-switch.active::after { left: 20px; }
+
+    /* modal styles */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.active { display: flex; animation: fadeIn 0.3s ease; }
+    .modal-content { background: var(--card-bg); padding: 24px; border-radius: 12px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); }
+    .modal-close { float: right; font-size: 24px; cursor: pointer; }
+
+    /* tabs */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+    .tab-btn { background: none; border: none; color: var(--muted); padding: 10px 16px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
     @media (max-width:900px){
       .report-grid{ grid-template-columns:1fr }
       .grid-3{ gap:10px }
+      header { flex-direction: column; align-items: flex-start; }
+      header div { width: 100%; }
+      .stats-grid { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    @media (max-width:600px){
+      header h1 { font-size: 16px; }
+      main.content { padding: 16px; }
+      .card { min-width: 150px; padding: 12px; }
+      .btn { padding: 8px 12px; font-size: 13px; }
+      .panel { padding: 12px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
     }
 
     /* Dark mode */
@@ -69,8 +124,9 @@
       body { background: white !important; color: black !important; }
       .app { box-shadow: none !important; background: white !important; }
       .card, .panel { background: white !important; border: 1px solid #ccc !important; }
-      .btn { display: none !important; }
-      header, footer { display: none !important; }
+      .btn, header div:last-child { display: none !important; }
+      .report-grid { grid-template-columns: 1fr !important; }
+      .modal { display: none !important; }
     }
   </style>
 </head>
@@ -82,7 +138,8 @@
         <p class="small">Adaptive quiz → tailored skills, professions & free resources</p>
       </div>
       <div>
-        <button class="btn secondary" id="settingsBtn" title="Settings">Settings</button>
+        <button class="btn secondary" id="profileBtn" title="Profile">Profile</button>
+        <button class="btn secondary" id="settingsBtn" title="Settings">⚙️</button>
         <button class="btn secondary" id="restartTop" title="Restart">Restart</button>
       </div>
     </header>
@@ -187,8 +244,9 @@
 
             <div style="margin-top:16px;">
               <button class="btn" id="restartBtn">Restart (Home)</button>
-              <button class="btn secondary" id="shareBtn">Share Report</button>
-              <button class="btn secondary" id="printBtn">Print Report</button>
+              <button class="btn secondary" id="shareBtn">📤 Share Report</button>
+              <button class="btn secondary" id="exportBtn" onclick="exportToPDF()">📥 Export</button>
+              <button class="btn secondary" id="printBtn">🖨️ Print</button>
             </div>
           </div>
         </div>
@@ -209,18 +267,118 @@
         </div>
       </section>
 
+      <!-- Page: User Profile -->
+      <section id="page-profile" class="page">
+        <div class="center">
+          <h2>👤 My Profile</h2>
+          <p class="lead">View your quiz history and stats.</p>
+          
+          <div style="max-width:400px; margin:20px auto; text-align:left;">
+            <div class="panel">
+              <h4>Quiz Summary</h4>
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-value" id="totalQuizzes">0</div>
+                  <div class="stat-label">Quizzes Taken</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value" id="bestSkill">—</div>
+                  <div class="stat-label">Top Skill</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value" id="avgScore">0%</div>
+                  <div class="stat-label">Avg Score</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel" style="margin-top:12px;">
+              <h4>Recent Results</h4>
+              <div id="recentResults" style="max-height:200px; overflow-y:auto;">
+                <p class="small" style="color:#999;">No completed quizzes yet</p>
+              </div>
+            </div>
+
+            <div class="panel" style="margin-top:12px;">
+              <h4>Learning Path</h4>
+              <p class="small" style="margin:0;">Continue developing your top skills by exploring recommended resources.</p>
+              <div style="margin-top:10px;">
+                <button class="btn secondary" style="width:100%;" onclick="goToQuiz()">📝 Retake Quiz</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px;">
+            <button class="btn secondary" id="backToIntroFromProfile">← Back to Home</button>
+          </div>
+        </div>
+      </section>
+
       <!-- Page: Settings -->
       <section id="page-settings" class="page">
         <div class="center">
-          <h2>Settings</h2>
-          <p class="lead">Customize your experience.</p>
-          <div style="margin-top:18px;">
-            <label style="display:block; margin:10px 0;">
-              <input type="checkbox" id="themeToggle"> Dark Mode
-            </label>
+          <h2>⚙️ Settings</h2>
+          <p class="lead">Customize your SkillSuggest experience.</p>
+          
+          <div style="max-width:400px; margin:20px auto; text-align:left;">
+            <div class="tabs" style="margin-bottom: 20px;">
+              <button class="tab-btn active" onclick="switchSettingsTab('theme')">Theme</button>
+              <button class="tab-btn" onclick="switchSettingsTab('data')">Data</button>
+              <button class="tab-btn" onclick="switchSettingsTab('about')">About</button>
+            </div>
+
+            <!-- Theme Tab -->
+            <div id="tab-theme" style="display:block;">
+              <div style="margin:16px 0; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+                <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                  <div class="toggle-switch" id="themeToggleSwitch"></div>
+                  <span>Dark Mode</span>
+                </label>
+              </div>
+              <div style="margin:16px 0; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+                <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                  <input type="checkbox" id="enableNotifications" style="width:16px; height:16px; cursor:pointer;"> Enable Notifications
+                </label>
+              </div>
+              <div style="margin:16px 0; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+                <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                  <input type="checkbox" id="enableAnalytics" checked style="width:16px; height:16px; cursor:pointer;"> Allow Usage Analytics
+                </label>
+              </div>
+            </div>
+
+            <!-- Data Tab -->
+            <div id="tab-data" style="display:none;">
+              <div style="margin:16px 0;">
+                <button class="btn" style="width:100%;" onclick="exportProgress()">📥 Export My Data</button>
+                <p class="small" style="margin-top:8px;">Download your quiz history and results as JSON</p>
+              </div>
+              <div style="margin:16px 0;">
+                <button class="btn secondary" style="width:100%;" onclick="clearAllData()">🗑️ Clear All Data</button>
+                <p class="small" style="margin-top:8px; color:#ff6b6b;">This will permanently delete all saved progress</p>
+              </div>
+              <div style="margin:16px 0; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+                <p class="small"><strong>Storage Used:</strong> <span id="storageInfo">Calculating...</span></p>
+              </div>
+            </div>
+
+            <!-- About Tab -->
+            <div id="tab-about" style="display:none;">
+              <div style="margin:16px 0; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+                <p class="small" style="margin:0;"><strong>Version:</strong> 2.0.0</p>
+                <p class="small" style="margin:8px 0 0 0;"><strong>Last Updated:</strong> Jan 2025</p>
+              </div>
+              <div style="margin:16px 0; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+                <p class="small">SkillSuggest is an adaptive career pathfinding tool that uses personalized quizzes to recommend skills, careers, and resources.</p>
+              </div>
+              <div style="margin:16px 0;">
+                <a href="#" onclick="showFeedback(); return false;" style="color:var(--accent); text-decoration:none; font-weight:600;">💬 Send Feedback</a>
+              </div>
+            </div>
           </div>
+
           <div style="margin-top:18px;">
-            <button class="btn secondary" id="backToIntroFromSettings">Back to Home</button>
+            <button class="btn secondary" id="backToIntroFromSettings">← Back to Home</button>
           </div>
         </div>
       </section>
@@ -236,7 +394,7 @@
   /************************
    * Adaptive Quiz - JS
    ************************/
-  // questions per group (short sets; you can expand)
+  // Expanded questions per group with more variety
   const questionSets = {
     "6-8": [
       { text:"Do you like exploring new ideas and projects?", skill:"Creativity" },
@@ -245,7 +403,12 @@
       { text:"Do you enjoy puzzles and logical games?", skill:"Logical Thinking" },
       { text:"Do you like helping friends solve their problems?", skill:"Empathy" },
       { text:"Do you like drawing or painting?", skill:"Creativity" },
-      { text:"Do you enjoy team sports or group activities?", skill:"Empathy" }
+      { text:"Do you enjoy team sports or group activities?", skill:"Empathy" },
+      { text:"Do you like building things with blocks or LEGO?", skill:"Technical" },
+      { text:"Do you come up with imaginative stories?", skill:"Creativity" },
+      { text:"Do you like being the leader in group projects?", skill:"Communication" },
+      { text:"Do you enjoy helping younger kids?", skill:"Empathy" },
+      { text:"Do you like solving riddles or brain teasers?", skill:"Logical Thinking" }
     ],
     "9-10": [
       { text:"Do you enjoy solving math problems or puzzles?", skill:"Logical Thinking" },
@@ -253,12 +416,16 @@
       { text:"Do you like writing or telling stories to others?", skill:"Communication" },
       { text:"Do you enjoy making creative art or designs?", skill:"Creativity" },
       { text:"Do you volunteer or help classmates often?", skill:"Empathy" },
-      // extra questions to make longer
       { text:"Do you plan study schedules for exams?", skill:"Logical Thinking" },
       { text:"Do you try to learn coding or app use by yourself?", skill:"Technical" },
       { text:"Do you participate in debates or presentations?", skill:"Communication" },
       { text:"Do you like inventing new games or toys?", skill:"Creativity" },
-      { text:"Do you enjoy organizing class events?", skill:"Empathy" }
+      { text:"Do you enjoy organizing class events?", skill:"Empathy" },
+      { text:"Do you watch how-to videos to learn new things?", skill:"Technical" },
+      { text:"Do you enjoy creating digital content (videos, graphics)?", skill:"Creativity" },
+      { text:"Do you like understanding how things work?", skill:"Logical Thinking" },
+      { text:"Do you comfort friends when they're upset?", skill:"Empathy" },
+      { text:"Do you express your ideas clearly in class?", skill:"Communication" }
     ],
     "11-12-arts": [
       { text:"Do you enjoy literature, history or languages?", skill:"Communication" },
@@ -268,7 +435,11 @@
       { text:"Do you explore creative career ideas often?", skill:"Creativity" },
       { text:"Do you help peers understand social topics?", skill:"Empathy" },
       { text:"Do you enjoy analyzing poems or artworks?", skill:"Communication" },
-      { text:"Do you like creating digital art or animations?", skill:"Creativity" }
+      { text:"Do you like creating digital art or animations?", skill:"Creativity" },
+      { text:"Do you write regularly (blog, journal, stories)?", skill:"Communication" },
+      { text:"Do you volunteer for social causes?", skill:"Empathy" },
+      { text:"Do you research topics deeply out of curiosity?", skill:"Logical Thinking" },
+      { text:"Do you express emotions through art or music?", skill:"Creativity" }
     ],
     "11-12-commerce": [
       { text:"Do you enjoy working with numbers and budgets?", skill:"Logical Thinking" },
@@ -277,7 +448,12 @@
       { text:"Do you like analyzing market trends or case studies?", skill:"Logical Thinking" },
       { text:"Do you enjoy organizing events or teams?", skill:"Communication" },
       { text:"Do you plan financial goals for yourself?", skill:"Logical Thinking" },
-      { text:"Do you learn about entrepreneurship online?", skill:"Technical" }
+      { text:"Do you learn about entrepreneurship online?", skill:"Technical" },
+      { text:"Do you enjoy negotiating or making deals?", skill:"Communication" },
+      { text:"Do you follow business news or stock markets?", skill:"Logical Thinking" },
+      { text:"Do you understand accounting or finance basics?", skill:"Technical" },
+      { text:"Do you like leading teams or group discussions?", skill:"Communication" },
+      { text:"Do you consider customer satisfaction important?", skill:"Empathy" }
     ],
     "11-12-science": [
       { text:"Do you enjoy experiments and lab work?", skill:"Technical" },
@@ -286,7 +462,12 @@
       { text:"Do you read scientific articles or watch science videos?", skill:"Technical" },
       { text:"Do you think about engineering or research careers?", skill:"Technical" },
       { text:"Do you enjoy building models or prototypes?", skill:"Technical" },
-      { text:"Do you discuss scientific discoveries with friends?", skill:"Communication" }
+      { text:"Do you discuss scientific discoveries with friends?", skill:"Communication" },
+      { text:"Do you understand complex systems or processes?", skill:"Logical Thinking" },
+      { text:"Do you design experiments to test hypotheses?", skill:"Technical" },
+      { text:"Do you want to solve real-world problems?", skill:"Empathy" },
+      { text:"Do you excel at precise calculations?", skill:"Logical Thinking" },
+      { text:"Do you stay updated with latest technology?", skill:"Technical" }
     ]
   };
 
@@ -334,17 +515,23 @@
     cont: document.getElementById('page-continue'),
     report: document.getElementById('page-report'),
     how: document.getElementById('page-how'),
+    profile: document.getElementById('page-profile'),
     settings: document.getElementById('page-settings')
   };
+
+  // quiz history
+  let quizHistory = [];
 
   // header / top buttons
   document.getElementById('restartTop').addEventListener('click', resetAll);
   document.getElementById('toUserInfo').addEventListener('click', ()=> showPage('userinfo'));
   document.getElementById('howBtnHeader').addEventListener('click', ()=> showPage('how'));
+  document.getElementById('profileBtn').addEventListener('click', ()=> { updateProfile(); showPage('profile'); });
 
   // settings
   document.getElementById('settingsBtn').addEventListener('click', ()=> showPage('settings'));
   document.getElementById('backToIntroFromSettings').addEventListener('click', ()=> showPage('intro'));
+  document.getElementById('backToIntroFromProfile').addEventListener('click', ()=> showPage('intro'));
 
   // how
   document.getElementById('backToIntroFromHow').addEventListener('click', ()=> showPage('intro'));
@@ -353,22 +540,37 @@
   const resumeBtn = document.getElementById('resumeBtn');
   resumeBtn.addEventListener('click', resumeQuiz);
 
-  // theme
-  const themeToggle = document.getElementById('themeToggle');
-  themeToggle.addEventListener('change', (e) => {
-    if (e.target.checked) {
-      document.body.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.body.classList.remove('dark');
-      localStorage.setItem('theme', '');
-    }
+  // theme - new toggle switch
+  const themeToggleSwitch = document.getElementById('themeToggleSwitch');
+  themeToggleSwitch.addEventListener('click', (e) => {
+    const isDark = document.body.classList.toggle('dark');
+    themeToggleSwitch.classList.toggle('active', isDark);
+    localStorage.setItem('theme', isDark ? 'dark' : '');
   });
 
   // load theme
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark');
-    themeToggle.checked = true;
+    themeToggleSwitch.classList.add('active');
+  }
+
+  // Notifications
+  document.getElementById('enableNotifications').addEventListener('change', (e) => {
+    localStorage.setItem('enableNotifications', e.target.checked);
+    if (e.target.checked && 'Notification' in window && Notification.permission === 'granted') {
+      new Notification('SkillSuggest', { body: 'Notifications enabled!' });
+    }
+  });
+  if (localStorage.getItem('enableNotifications') === 'true') {
+    document.getElementById('enableNotifications').checked = true;
+  }
+
+  // Analytics toggle
+  document.getElementById('enableAnalytics').addEventListener('change', (e) => {
+    localStorage.setItem('enableAnalytics', e.target.checked);
+  });
+  if (localStorage.getItem('enableAnalytics') !== 'false') {
+    document.getElementById('enableAnalytics').checked = true;
   }
 
   // userinfo cards click
@@ -505,6 +707,7 @@
   // produce report
   let chartInstance = null;
   function showReport(){
+    saveQuizResult(); // Save to history
     showPage('report');
     // prepare chart data
     const labels = Object.keys(scores);
@@ -575,9 +778,138 @@
   function shareResult(){
     const sorted = Object.keys(scores).map(k=>({k,v:scores[k]})).sort((a,b)=>b.v-a.v);
     const top = sorted[0]?sorted[0].k:'my top skill';
-    const text = `SkillSuggest: my top skill is ${top}. Try SkillSuggest for guided skills & careers!`;
-    if(navigator.clipboard) navigator.clipboard.writeText(text).then(()=> alert('Copied to clipboard!'));
-    else prompt('Copy this:', text);
+    const emoji = getSkillEmoji(top);
+    const text = `${emoji} My SkillSuggest Profile: Top skill is ${top}! 🎯\n\nDiscover your strengths with SkillSuggest → https://github.com/darsh-rana/theSkillSuggest`;
+    
+    if(navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(()=> {
+        const btn = document.getElementById('shareBtn');
+        const oldText = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(()=> btn.textContent = oldText, 2000);
+      });
+    } else {
+      prompt('Copy this:', text);
+    }
+  }
+
+  function getSkillEmoji(skill) {
+    const emojis = {
+      'Creativity': '🎨',
+      'Logical Thinking': '🧠',
+      'Communication': '💬',
+      'Technical': '⚙️',
+      'Empathy': '❤️'
+    };
+    return emojis[skill] || '✨';
+  }
+
+  function exportToPDF() {
+    const sorted = Object.keys(scores).map(k=>({k,v:scores[k]})).sort((a,b)=>b.v-a.v);
+    const top3 = sorted.slice(0,3);
+    const date = new Date().toLocaleDateString();
+    
+    let content = `SKILLSUGGEST REPORT\n`;
+    content += `Generated: ${date}\n\n`;
+    content += `CLASS/GROUP: ${selectedGroup || 'N/A'}\n`;
+    if(selectedStream) content += `STREAM: ${selectedStream.toUpperCase()}\n`;
+    content += `\n`;
+    content += `SKILL BREAKDOWN:\n`;
+    Object.keys(scores).forEach(k => {
+      content += `  ${k}: ${scores[k]} points\n`;
+    });
+    content += `\n`;
+    content += `TOP RECOMMENDATIONS:\n`;
+    top3.forEach((s, i) => {
+      content += `${i+1}. ${s.k} (${s.v} points)\n`;
+    });
+    
+    // Create and download txt file (simpler than PDF for single file)
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `SkillSuggest-Report-${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function updateProfile() {
+    loadQuizHistory();
+    const totalQuizzes = quizHistory.length;
+    document.getElementById('totalQuizzes').textContent = totalQuizzes;
+    
+    if (quizHistory.length > 0) {
+      const lastQuiz = quizHistory[quizHistory.length - 1];
+      const sorted = Object.keys(lastQuiz.scores).map(k=>({k,v:lastQuiz.scores[k]})).sort((a,b)=>b.v-a.v);
+      document.getElementById('bestSkill').textContent = sorted[0]?.k || '—';
+      
+      const totalPoints = Object.values(lastQuiz.scores).reduce((a,b)=>a+b,0);
+      const maxPoints = currentQuestions.length || 10;
+      const avgScore = Math.round((totalPoints / maxPoints) * 100);
+      document.getElementById('avgScore').textContent = avgScore + '%';
+      
+      const recentEl = document.getElementById('recentResults');
+      recentEl.innerHTML = quizHistory.slice(-5).reverse().map((q, i) => {
+        const s = Object.keys(q.scores).map(k=>({k,v:q.scores[k]})).sort((a,b)=>b.v-a.v)[0];
+        return `<div style="padding:8px; background:rgba(255,255,255,0.03); border-radius:6px; margin:6px 0;">
+          <p class="small" style="margin:0;"><strong>${s.k}</strong> • ${new Date(q.date).toLocaleDateString()}</p>
+        </div>`;
+      }).join('');
+    }
+    
+    updateStorageInfo();
+  }
+
+  function updateStorageInfo() {
+    const data = JSON.stringify(localStorage);
+    const bytes = new Blob([data]).size;
+    const kb = (bytes / 1024).toFixed(2);
+    document.getElementById('storageInfo').textContent = `${kb} KB`;
+  }
+
+  function exportProgress() {
+    loadQuizHistory();
+    const userData = {
+      timestamp: new Date().toISOString(),
+      history: quizHistory,
+      settings: {
+        theme: localStorage.getItem('theme'),
+        notifications: localStorage.getItem('enableNotifications'),
+        analytics: localStorage.getItem('enableAnalytics')
+      }
+    };
+    const blob = new Blob([JSON.stringify(userData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `SkillSuggest-Data-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert('Your data has been exported!');
+  }
+
+  function clearAllData() {
+    if (confirm('Are you sure? This will delete all your quiz history and settings.')) {
+      localStorage.clear();
+      location.reload();
+    }
+  }
+
+  function switchSettingsTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
+    
+    event.target.classList.add('active');
+    document.getElementById('tab-' + tab).style.display = 'block';
+  }
+
+  function showFeedback() {
+    alert('📧 Share your feedback:\n\nEmail: feedback@skillsuggest.com\nGitHub: github.com/darsh-rana/theSkillSuggest\n\nWe appreciate your suggestions!');
+  }
+
+  function goToQuiz() {
+    showPage('intro');
   }
 
   function saveProgress() {
@@ -599,6 +931,28 @@
       savedQIndex = state.qIndex;
       Object.assign(scores, state.scores);
       resumeBtn.style.display = 'inline-block';
+    }
+  }
+
+  function loadQuizHistory() {
+    const hist = localStorage.getItem('quizHistory');
+    quizHistory = hist ? JSON.parse(hist) : [];
+  }
+
+  function saveQuizResult() {
+    loadQuizHistory();
+    quizHistory.push({
+      date: new Date().toISOString(),
+      group: selectedGroup,
+      stream: selectedStream,
+      scores: {...scores},
+      totalQuestions: currentQuestions.length
+    });
+    localStorage.setItem('quizHistory', JSON.stringify(quizHistory));
+    
+    // Send analytics if enabled
+    if (localStorage.getItem('enableAnalytics') !== 'false') {
+      // Analytics tracking code here (optional)
     }
   }
 
