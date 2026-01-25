@@ -3,11 +3,6 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2575fc">
-
-
   <title>SkillSuggest — Adaptive Career Pathfinder</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -62,23 +57,32 @@
       .report-grid{ grid-template-columns:1fr }
       .grid-3{ gap:10px }
     }
-  #scoreChart {
-  height: 260px !important;
-  max-height: 260px !important;
-}
-                                          
+
+    /* Dark mode */
+    body.dark {
+      --bg1:#1a1a2e; --bg2:#16213e; --card-bg: rgba(0,0,0,0.20);
+      --accent:#00d4aa; --muted: rgba(255,255,255,0.7);
+    }
+
+    /* Print styles */
+    @media print {
+      body { background: white !important; color: black !important; }
+      .app { box-shadow: none !important; background: white !important; }
+      .card, .panel { background: white !important; border: 1px solid #ccc !important; }
+      .btn { display: none !important; }
+      header, footer { display: none !important; }
+    }
   </style>
 </head>
 <body>
-  
   <div class="app" role="application" aria-label="SkillSuggest">
     <header>
       <div>
         <h1>🎯 SkillSuggest</h1>
         <p class="small">Adaptive quiz → tailored skills, professions & free resources</p>
       </div>
-     
       <div>
+        <button class="btn secondary" id="settingsBtn" title="Settings">Settings</button>
         <button class="btn secondary" id="restartTop" title="Restart">Restart</button>
       </div>
     </header>
@@ -91,6 +95,7 @@
           <p class="lead">Answer a short adaptive quiz so we can recommend skills, careers and free resources for your age & stream.</p>
           <div style="margin-top:18px">
             <button class="btn" id="toUserInfo">Start Quiz</button>
+            <button class="btn secondary" id="resumeBtn" style="display:none">Resume Quiz</button>
             <button class="btn secondary" id="howBtnHeader">How it works</button>
           </div>
         </div>
@@ -177,18 +182,53 @@
             <h4 style="margin-top:14px;">Suggested Resources</h4>
             <div id="resourceList" style="margin-top:10px"></div>
 
+            <h4 style="margin-top:14px;">Career Tips</h4>
+            <div id="careerTips" style="margin-top:10px"></div>
+
             <div style="margin-top:16px;">
               <button class="btn" id="restartBtn">Restart (Home)</button>
               <button class="btn secondary" id="shareBtn">Share Report</button>
+              <button class="btn secondary" id="printBtn">Print Report</button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page: How it works -->
+      <section id="page-how" class="page">
+        <div class="center">
+          <h2>How it works</h2>
+          <p class="lead">SkillSuggest helps you discover your strengths through a simple quiz.</p>
+          <ul style="text-align:left; max-width:400px; margin:18px auto; padding-left:20px;">
+            <li>Select your class/age group to tailor questions.</li>
+            <li>If in Class 11-12, choose your stream (Arts, Commerce, Science).</li>
+            <li>Answer yes/no questions about your interests and activities.</li>
+            <li>View your personalized skill profile, career suggestions, and free resources.</li>
+          </ul>
+          <button class="btn" id="backToIntroFromHow">Got it</button>
+        </div>
+      </section>
+
+      <!-- Page: Settings -->
+      <section id="page-settings" class="page">
+        <div class="center">
+          <h2>Settings</h2>
+          <p class="lead">Customize your experience.</p>
+          <div style="margin-top:18px;">
+            <label style="display:block; margin:10px 0;">
+              <input type="checkbox" id="themeToggle"> Dark Mode
+            </label>
+          </div>
+          <div style="margin-top:18px;">
+            <button class="btn secondary" id="backToIntroFromSettings">Back to Home</button>
           </div>
         </div>
       </section>
     </main>
 
     <footer style="padding:12px 22px; border-top:1px solid rgba(255,255,255,0.03); display:flex; justify-content:space-between;">
-      
-      <div class="small">Offline • Free resources</div>
+      <div class="small">Made for Makers Fest — SkillSuggest</div>
+      <div class="small">Offline • Free resources • <a href="#" id="feedbackLink" style="color:var(--muted); text-decoration:underline;">Feedback</a></div>
     </footer>
   </div>
 
@@ -203,7 +243,9 @@
       { text:"Do you enjoy simple science experiments or kits?", skill:"Technical" },
       { text:"Do you like reading stories and discussing characters?", skill:"Communication" },
       { text:"Do you enjoy puzzles and logical games?", skill:"Logical Thinking" },
-      { text:"Do you like helping friends solve their problems?", skill:"Empathy" }
+      { text:"Do you like helping friends solve their problems?", skill:"Empathy" },
+      { text:"Do you like drawing or painting?", skill:"Creativity" },
+      { text:"Do you enjoy team sports or group activities?", skill:"Empathy" }
     ],
     "9-10": [
       { text:"Do you enjoy solving math problems or puzzles?", skill:"Logical Thinking" },
@@ -214,7 +256,9 @@
       // extra questions to make longer
       { text:"Do you plan study schedules for exams?", skill:"Logical Thinking" },
       { text:"Do you try to learn coding or app use by yourself?", skill:"Technical" },
-      { text:"Do you participate in debates or presentations?", skill:"Communication" }
+      { text:"Do you participate in debates or presentations?", skill:"Communication" },
+      { text:"Do you like inventing new games or toys?", skill:"Creativity" },
+      { text:"Do you enjoy organizing class events?", skill:"Empathy" }
     ],
     "11-12-arts": [
       { text:"Do you enjoy literature, history or languages?", skill:"Communication" },
@@ -222,21 +266,27 @@
       { text:"Do you enjoy thinking about society and people?", skill:"Empathy" },
       { text:"Do you participate in theater, writing or debating?", skill:"Communication" },
       { text:"Do you explore creative career ideas often?", skill:"Creativity" },
-      { text:"Do you help peers understand social topics?", skill:"Empathy" }
+      { text:"Do you help peers understand social topics?", skill:"Empathy" },
+      { text:"Do you enjoy analyzing poems or artworks?", skill:"Communication" },
+      { text:"Do you like creating digital art or animations?", skill:"Creativity" }
     ],
     "11-12-commerce": [
       { text:"Do you enjoy working with numbers and budgets?", skill:"Logical Thinking" },
       { text:"Are you interested in starting a small business or selling things?", skill:"Technical" },
       { text:"Do you enjoy presenting ideas or pitching plans?", skill:"Communication" },
       { text:"Do you like analyzing market trends or case studies?", skill:"Logical Thinking" },
-      { text:"Do you enjoy organizing events or teams?", skill:"Communication" }
+      { text:"Do you enjoy organizing events or teams?", skill:"Communication" },
+      { text:"Do you plan financial goals for yourself?", skill:"Logical Thinking" },
+      { text:"Do you learn about entrepreneurship online?", skill:"Technical" }
     ],
     "11-12-science": [
       { text:"Do you enjoy experiments and lab work?", skill:"Technical" },
       { text:"Do you like solving physics/chemistry/math problems?", skill:"Logical Thinking" },
       { text:"Do you plan and test solutions carefully?", skill:"Logical Thinking" },
       { text:"Do you read scientific articles or watch science videos?", skill:"Technical" },
-      { text:"Do you think about engineering or research careers?", skill:"Technical" }
+      { text:"Do you think about engineering or research careers?", skill:"Technical" },
+      { text:"Do you enjoy building models or prototypes?", skill:"Technical" },
+      { text:"Do you discuss scientific discoveries with friends?", skill:"Communication" }
     ]
   };
 
@@ -258,11 +308,21 @@
     "Empathy":[{title:"Coursera - Social Work",url:"https://www.coursera.org/courses?query=social%20work"},{title:"VolunteerMatch",url:"https://www.volunteermatch.org/"}]
   };
 
+  // career tips
+  const careerTips = {
+    "Logical Thinking": "Focus on developing analytical skills through math, puzzles, and logic games. Consider careers in engineering, finance, or research where problem-solving is key.",
+    "Creativity": "Nurture your imagination by exploring art, design, and innovative projects. Careers in graphic design, writing, or entrepreneurship could suit you.",
+    "Communication": "Build confidence in expressing ideas through debates, writing, or public speaking. Roles in teaching, journalism, or marketing might be ideal.",
+    "Technical": "Dive into hands-on learning with coding, electronics, or experiments. Tech fields like software development or engineering offer great opportunities.",
+    "Empathy": "Strengthen your ability to understand others through volunteering or helping roles. Consider paths in counseling, healthcare, or social services."
+  };
+
   // app state
   let selectedGroup = null;     // e.g. "6-8" or "11-12"
   let selectedStream = null;    // for 11-12 -> "arts"/"commerce"/"science"
   let currentQuestions = [];    // array used for quiz
   let qIndex = 0;
+  let savedQIndex = 0;
   const scores = { "Logical Thinking":0, "Creativity":0, "Communication":0, "Technical":0, "Empathy":0 };
 
   // page elements
@@ -272,13 +332,44 @@
     stream: document.getElementById('page-stream'),
     quiz: document.getElementById('page-quiz'),
     cont: document.getElementById('page-continue'),
-    report: document.getElementById('page-report')
+    report: document.getElementById('page-report'),
+    how: document.getElementById('page-how'),
+    settings: document.getElementById('page-settings')
   };
 
   // header / top buttons
   document.getElementById('restartTop').addEventListener('click', resetAll);
   document.getElementById('toUserInfo').addEventListener('click', ()=> showPage('userinfo'));
-  document.getElementById('howBtnHeader').addEventListener('click', ()=> alert("Answer a few questions adapted to your class/stream. We'll suggest skills, careers and free resources."));
+  document.getElementById('howBtnHeader').addEventListener('click', ()=> showPage('how'));
+
+  // settings
+  document.getElementById('settingsBtn').addEventListener('click', ()=> showPage('settings'));
+  document.getElementById('backToIntroFromSettings').addEventListener('click', ()=> showPage('intro'));
+
+  // how
+  document.getElementById('backToIntroFromHow').addEventListener('click', ()=> showPage('intro'));
+
+  // resume
+  const resumeBtn = document.getElementById('resumeBtn');
+  resumeBtn.addEventListener('click', resumeQuiz);
+
+  // theme
+  const themeToggle = document.getElementById('themeToggle');
+  themeToggle.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      document.body.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark');
+      localStorage.setItem('theme', '');
+    }
+  });
+
+  // load theme
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+    themeToggle.checked = true;
+  }
 
   // userinfo cards click
   document.querySelectorAll('#page-userinfo .card').forEach(card=>{
@@ -306,6 +397,13 @@
   // report actions
   document.getElementById('restartBtn').addEventListener('click', resetAll);
   document.getElementById('shareBtn').addEventListener('click', shareResult);
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+  // feedback
+  document.getElementById('feedbackLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('We appreciate your feedback! Please share your thoughts at feedback@skillsuggest.com or on our GitHub.');
+  });
 
   // helper to show page
   function showPage(name){
@@ -318,6 +416,7 @@
   // selecting group
   function selectGroup(g){
     selectedGroup = g;
+    saveProgress();
     if(g === '11-12'){
       // need stream selection
       showPage('stream');
@@ -329,6 +428,7 @@
 
   function selectStream(s){
     selectedStream = s;
+    saveProgress();
     const groupKey = `11-12-${s}`;
     prepareQuestionsForGroup(groupKey);
     startQuiz();
@@ -340,9 +440,18 @@
     while(currentQuestions.length < 8){
       currentQuestions = currentQuestions.concat(currentQuestions.slice(0,3));
     }
+    // shuffle questions for variety
+    shuffle(currentQuestions);
     qIndex = 0;
     // reset scores
     for(let k in scores) scores[k] = 0;
+  }
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
   }
 
   function startQuiz(){
@@ -389,6 +498,7 @@
     const q = currentQuestions[qIndex];
     if(isYes) scores[q.skill] = (scores[q.skill] || 0) + 1;
     qIndex++;
+    saveProgress();
     renderQuestion();
   }
 
@@ -448,34 +558,20 @@
       });
     });
 
+    // career tips
+    const tipsEl = document.getElementById('careerTips');
+    tipsEl.innerHTML = `<p class="small">${careerTips[top3[0].k] || "Keep exploring your interests and strengths!"}</p>`;
+
     // draw chart
     const ctx = document.getElementById('scoreChart').getContext('2d');
     if(chartInstance) chartInstance.destroy();
-   chartInstance = new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels,
-    datasets: [{
-      data: values,
-      backgroundColor: ['#a78bfa','#f472b6','#60a5fa','#34d399','#f59e0b'],
-      borderRadius: 6
-    }]
-  },
-  options: {
-    animation: false,
-    responsive: true,
-    maintainAspectRatio: false,
-    resizeDelay: 300,    // ✅ FIXES continuous stretching
-
-    scales: {
-      y: { beginAtZero: true, ticks: { stepSize: 1 } }
-    },
-    plugins: {
-      legend: { display: false }
-    }
+    chartInstance = new Chart(ctx, {
+      type:'bar',
+      data:{ labels, datasets:[{ data:values, backgroundColor:['#a78bfa','#f472b6','#60a5fa','#34d399','#f59e0b'], borderRadius:6 }] },
+      options:{ scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1 } } }, plugins:{ legend:{ display:false } }, responsive:true, maintainAspectRatio:false, animation: false }
+    });
   }
-});
-   }
+
   function shareResult(){
     const sorted = Object.keys(scores).map(k=>({k,v:scores[k]})).sort((a,b)=>b.v-a.v);
     const top = sorted[0]?sorted[0].k:'my top skill';
@@ -484,11 +580,44 @@
     else prompt('Copy this:', text);
   }
 
+  function saveProgress() {
+    const state = {
+      selectedGroup,
+      selectedStream,
+      qIndex,
+      scores: {...scores}
+    };
+    localStorage.setItem('quizProgress', JSON.stringify(state));
+  }
+
+  function loadProgress() {
+    const saved = localStorage.getItem('quizProgress');
+    if (saved) {
+      const state = JSON.parse(saved);
+      selectedGroup = state.selectedGroup;
+      selectedStream = state.selectedStream;
+      savedQIndex = state.qIndex;
+      Object.assign(scores, state.scores);
+      resumeBtn.style.display = 'inline-block';
+    }
+  }
+
+  function resumeQuiz() {
+    if (!currentQuestions.length) {
+      const key = selectedGroup === '11-12' ? `11-12-${selectedStream}` : selectedGroup;
+      prepareQuestionsForGroup(key);
+    }
+    qIndex = savedQIndex;
+    showPage('quiz');
+    setTimeout(() => renderQuestion(), 80);
+  }
+
   function resetAll(){
     // reset state and show intro
-    selectedGroup = null; selectedStream = null; currentQuestions = []; qIndex = 0;
+    selectedGroup = null; selectedStream = null; currentQuestions = []; qIndex = 0; savedQIndex = 0;
     for(let k in scores) scores[k]=0;
     if(chartInstance){ chartInstance.destroy(); chartInstance = null; }
+    localStorage.removeItem('quizProgress');
     showPage('intro');
   }
 
@@ -499,21 +628,7 @@
 
   // optional: initial test hook
   // showPage('intro'); // already active
-    if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js");
-  });
-}
-
+  loadProgress();
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
